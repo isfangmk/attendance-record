@@ -37,12 +37,13 @@ export const MonthNavigation: React.FC<MonthNavigationProps> = ({
   // 月份名称数组（用于显示）
   const monthNames = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
   
-  // 检查是否为当前月份（用于控制下月按钮状态）
+  // 下月：不可超过本月；上月：不可跨入去年
   const now = new Date();
   const isCurrentMonth = currentYear === now.getFullYear() && currentMonth === now.getMonth();
+  const isYearFloor = currentYear === now.getFullYear() && currentMonth === 0;
 
   return (
-    <div className="bg-white rounded-xl shadow-card p-5 md:p-6 mb-6">
+    <div className="surface-panel rounded-2xl p-5 md:p-6 mb-6">
       {/* 月份选择器 */}
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
         {/* 月份切换按钮组 */}
@@ -50,7 +51,10 @@ export const MonthNavigation: React.FC<MonthNavigationProps> = ({
           {/* 上月按钮 */}
           <button
             onClick={onPrevMonth}
-            className="w-10 h-10 rounded-full border border-neutral-200 flex items-center justify-center hover:bg-neutral-100 transition-colors duration-200"
+            disabled={isYearFloor}
+            className={`w-10 h-10 rounded-full border border-neutral-200 flex items-center justify-center transition-colors duration-200 ${
+              isYearFloor ? 'btn-disabled' : 'hover:bg-neutral-100'
+            }`}
             aria-label="上个月"
           >
             <i className="fa fa-chevron-left text-neutral-500"></i>
@@ -86,7 +90,12 @@ export const MonthNavigation: React.FC<MonthNavigationProps> = ({
           </button>
           <button
             onClick={onLastMonth}
-            className="px-3 py-1.5 text-sm rounded-lg bg-neutral-100 text-neutral-600 hover:bg-neutral-200 transition-colors duration-200"
+            disabled={isYearFloor}
+            className={`px-3 py-1.5 text-sm rounded-lg transition-colors duration-200 ${
+              isYearFloor
+                ? 'btn-disabled bg-neutral-100 text-neutral-400'
+                : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
+            }`}
           >
             上月
           </button>
@@ -108,6 +117,10 @@ export const MonthNavigation: React.FC<MonthNavigationProps> = ({
         <div className="flex items-center gap-1.5">
           <span className="w-3 h-3 rounded-full bg-warning"></span>
           <span>早退 (&lt;9小时)</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="w-3 h-3 rounded-full bg-working"></span>
+          <span>进行中（当天未下班）</span>
         </div>
         <div className="flex items-center gap-1.5">
           <span className="w-3 h-3 rounded-full bg-overtime/20"></span>

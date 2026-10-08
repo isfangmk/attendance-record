@@ -1,2 +1,37 @@
-/.idea/
-/__pycache__/
+# IDE / 本地工具
+.idea/
+.vscode/
+.serena/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# 用户持久化登录态（含 Cookie，禁止入库）
+user_data.json
+
+# 运行时配置（含 Webhook，禁止入库）
+settings.json
+
+# 前端
+panel/node_modules/
+panel/dist/
+panel/coverage/
+
+# 系统杂项
+.DS_Store
+Thumbs.db
+*.log
+.env
+.env.local
+
+# 接口探测临时数据
+.probe/

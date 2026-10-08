@@ -32,6 +32,10 @@ export const API_ENDPOINTS = {
   
   // 出勤数据
   ATTENDANCE: '/attendance',
+
+  // 系统配置
+  SETTINGS: '/settings',
+  TEST_WEBHOOK: '/settings/test-webhook',
 } as const;
 
 /**

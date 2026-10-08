@@ -64,7 +64,6 @@ export const MealTooltip: React.FC<MealTooltipProps> = ({
     e.stopPropagation();
   }, []);
 
-  console.log('MealTooltip 渲染', { isVisible, mealDates, year, month });
   if (!isVisible) return null;
 
   return (

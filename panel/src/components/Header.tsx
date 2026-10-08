@@ -1,66 +1,67 @@
 /**
- * 头部导航组件
- * 显示应用标题、用户信息和登录/登出功能
+ * 顶部导航：标题、配置入口与登录状态
  */
 
-import React from 'react';
-
 interface HeaderProps {
-  userEmail?: string;
+  isLoggedIn: boolean;
+  displayName?: string;
   onLoginClick: () => void;
   onLogoutClick: () => void;
+  onSettingsClick: () => void;
 }
 
 /**
- * 头部导航组件
- * @param userEmail 用户邮箱
- * @param onLoginClick 登录按钮点击事件
- * @param onLogoutClick 登出按钮点击事件
+ * 粘性顶栏（毛玻璃）
  */
-export const Header: React.FC<HeaderProps> = ({
-  userEmail,
+export const Header = ({
+  isLoggedIn,
+  displayName,
   onLoginClick,
   onLogoutClick,
-}) => {
+  onSettingsClick,
+}: HeaderProps) => {
   return (
-    <header className="bg-white shadow-sm sticky top-0 z-30">
+    <header className="sticky top-0 z-30 border-b border-white/40 bg-white/70 backdrop-blur-xl">
       <div className="container mx-auto max-w-[min(85vw,1020px)] px-4 py-3 flex items-center justify-between">
-        {/* 左侧标题区域 */}
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-white">
-            <i className="fa fa-calendar-check-o text-xl"></i>
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-white shadow-sm">
+            <i className="fa fa-calendar-check-o text-xl" />
           </div>
-          <h1 className="text-[clamp(1.25rem,3vw,1.5rem)] font-bold text-neutral-700">
+          <h1 className="font-display text-[clamp(1.25rem,3vw,1.5rem)] font-bold text-neutral-700 tracking-tight">
             出勤统计面板
           </h1>
         </div>
 
-        {/* 右侧用户信息区域 */}
-        <div className="flex items-center gap-4">
-          {userEmail ? (
+        <div className="flex items-center gap-2 sm:gap-3">
+          {isLoggedIn ? (
             <>
-              {/* 用户信息显示（不可点击） */}
+              <button
+                onClick={onSettingsClick}
+                className="flex items-center gap-2 px-3 py-2 text-sm text-neutral-600 hover:text-primary hover:bg-primary/10 rounded-xl transition-colors duration-200"
+                title="提醒配置"
+              >
+                <i className="fa fa-bell-o" />
+                <span className="hidden sm:inline">提醒配置</span>
+              </button>
               <div className="hidden md:flex items-center gap-2 text-neutral-600">
-                <i className="fa fa-user-o"></i>
-                <span className="font-medium">{userEmail.split('@')[0]}</span>
+                <i className="fa fa-user-o" />
+                <span className="font-medium">{displayName}</span>
               </div>
-              {/* 退出按钮 */}
               <button
                 onClick={onLogoutClick}
-                className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors duration-200"
+                className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 rounded-xl transition-colors duration-200"
                 title="退出登录"
               >
-                <i className="fa fa-sign-out"></i>
+                <i className="fa fa-sign-out" />
                 <span className="hidden sm:inline">退出</span>
               </button>
             </>
           ) : (
-            /* 登录按钮 */
             <button
               onClick={onLoginClick}
-              className="flex items-center gap-2 px-4 py-2 text-sm text-primary bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors duration-200"
+              className="flex items-center gap-2 px-4 py-2 text-sm text-primary bg-primary/10 hover:bg-primary/15 rounded-xl transition-colors duration-200"
             >
-              <i className="fa fa-sign-in"></i>
+              <i className="fa fa-sign-in" />
               <span>登录</span>
             </button>
           )}

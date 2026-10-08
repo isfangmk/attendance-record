@@ -1,144 +1,65 @@
 /**
- * 出勤数据管理相关的自定义Hook
- * 管理出勤数据的获取、月份切换等功能
+ * 出勤数据 Hook：拉月度数据、切换月份
  */
 
-import { useState, useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { getApiUrl, API_ENDPOINTS } from '../config/api';
-
-// 打卡记录接口
-interface CheckInRecord {
-  time: string;
-  type?: string;
-}
-
-// 日历日期数据接口
-interface CalendarDay {
-  date: number;
-  status: 'present' | 'early_leave' | 'overtime' | 'holiday' | 'none';
-  checkIns?: CheckInRecord[];
-  workHours?: number;
-  isHoliday?: boolean;
-  holidayType?: string;
-}
-
-// 统计摘要接口
-interface Summary {
-  totalAttendance: number;
-  avgHours: number;
-  earlyLeaveCount: number;
-  leaveDays: number;
-  outDays: number;
-  overtimeDays: number;
-  workDays: number;
-}
-
-// 出勤数据响应接口
-interface AttendanceData {
-  year: number;
-  month: number; // 0-11，与Date对象一致
-  firstDayOfMonth: number; // 该月第一天是星期几（0=周一，6=周日）
-  days: CalendarDay[];
-  summary: Summary;
-}
-
-// API响应接口
-interface ApiResponse {
-  msg: string;
-  data?: AttendanceData;
-}
+import type { ApiEnvelope, MonthAttendance } from '../types/attendance';
 
 /**
- * 出勤数据管理Hook
- * @returns 出勤数据相关的状态和方法
+ * 管理当前年月与出勤数据
  */
 export const useAttendanceData = () => {
-  // 当前显示的年月（与Date对象月份索引一致：0-11）
-  const currentDate = new Date();
-  const [currentYear, setCurrentYear] = useState<number>(currentDate.getFullYear());
-  const [currentMonth, setCurrentMonth] = useState<number>(currentDate.getMonth());
-
-  // 数据状态
-  const [data, setData] = useState<AttendanceData | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const now = new Date();
+  const [currentYear, setCurrentYear] = useState(now.getFullYear());
+  // 前端月份索引 0-11，请求后端时转为 1-12
+  const [currentMonth, setCurrentMonth] = useState(now.getMonth());
+  const [data, setData] = useState<MonthAttendance | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  /**
-   * 清除错误信息
-   */
-  const clearError = useCallback(() => {
-    setError(null);
-  }, []);
+  const clearError = useCallback(() => setError(null), []);
 
   /**
-   * 加载指定年月的出勤数据
-   * @param year 年份
-   * @param month 月份（0-11）
-   * @param userEmail 用户邮箱
+   * 加载指定年月出勤
+   * @param year 年
+   * @param month 月（0-11）
+   * @param userEmail 已登录邮箱
    */
-  const loadData = useCallback(async (year: number, month: number, userEmail?: string): Promise<void> => {
+  const loadData = useCallback(async (year: number, month: number, userEmail?: string) => {
     setIsLoading(true);
     setError(null);
-
     try {
-      // 如果未登录，显示提示信息但不报错
       if (!userEmail) {
         setData(null);
         return;
       }
-
-      // 显示加载状态
       setData(null);
-
-      // 发送请求给后端（月份转换为1-12格式）
-      const displayMonth = month + 1;
       const response = await fetch(getApiUrl(API_ENDPOINTS.ATTENDANCE), {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          year: year,
-          month: displayMonth,
+          year,
+          month: month + 1,
           email: userEmail,
         }),
       });
-
-      // 处理HTTP错误状态码
       if (!response.ok) {
-        let errorData: any = null;
-        try {
-          errorData = await response.json();
-        } catch {
-          errorData = null;
-        }
-        throw new Error(errorData?.message || `请求失败，状态码: ${response.status}`);
+        throw new Error(`请求失败，状态码: ${response.status}`);
       }
-
-      // 解析响应数据
-      const responseData: ApiResponse = await response.json();
-
-      // 检查是否需要重新登录
-      if (responseData.msg === '请先登录' || responseData.data === null) {
+      const envelope: ApiEnvelope<MonthAttendance> = await response.json();
+      if (envelope.msg === '请先登录' || envelope.data == null) {
         setData(null);
-        // 清除本地登录状态
         localStorage.removeItem('loggedInEmail');
+        localStorage.removeItem('displayName');
         localStorage.removeItem('loginMethod');
-        // 触发页面重新渲染以更新登录状态
         window.dispatchEvent(new CustomEvent('auth-state-changed'));
         return;
       }
-
-      // 验证数据结构完整性
-      if (!responseData.data || !responseData.data.summary || !responseData.data.days) {
+      if (!envelope.data.summary || !envelope.data.days) {
         throw new Error('后端返回数据格式不正确');
       }
-
-      // 更新数据（确保月份索引为0-11）
-      setData({
-        ...responseData.data,
-        month: month, // 使用传入的月份索引（0-11）
-      });
+      setData({ ...envelope.data, month });
     } catch (err) {
       console.error('获取出勤数据失败:', err);
       setError(err instanceof Error ? err.message : '获取数据失败');
@@ -148,62 +69,47 @@ export const useAttendanceData = () => {
     }
   }, []);
 
-  /**
-   * 切换到上个月
-   */
   const goToPrevMonth = useCallback(() => {
+    const todayYear = new Date().getFullYear();
+    // 不允许翻到去年及更早
+    if (currentYear < todayYear) return;
+    if (currentYear === todayYear && currentMonth === 0) return;
     setCurrentMonth((prev) => {
       if (prev === 0) {
         setCurrentYear((y) => y - 1);
-        return 11; // 1月的上月是12月
+        return 11;
       }
       return prev - 1;
     });
-  }, []);
+  }, [currentYear, currentMonth]);
 
-  /**
-   * 切换到下个月
-   */
   const goToNextMonth = useCallback(() => {
-    // 检查是否为当前月份，如果是则不允许切换
-    const now = new Date();
-    const isCurrentMonth = currentYear === now.getFullYear() && currentMonth === now.getMonth();
-    if (isCurrentMonth) return;
-
+    const today = new Date();
+    if (currentYear === today.getFullYear() && currentMonth === today.getMonth()) {
+      return;
+    }
     setCurrentMonth((prev) => {
       if (prev === 11) {
         setCurrentYear((y) => y + 1);
-        return 0; // 12月的下月是1月
+        return 0;
       }
       return prev + 1;
     });
   }, [currentYear, currentMonth]);
 
-  /**
-   * 切换到当前月份
-   */
   const goToCurrentMonth = useCallback(() => {
-    const now = new Date();
-    setCurrentYear(now.getFullYear());
-    setCurrentMonth(now.getMonth());
+    const today = new Date();
+    setCurrentYear(today.getFullYear());
+    setCurrentMonth(today.getMonth());
   }, []);
 
-  /**
-   * 切换到上个月
-   */
   const goToLastMonth = useCallback(() => {
-    const lastMonthDate = new Date(currentYear, currentMonth - 1, 1);
-    setCurrentYear(lastMonthDate.getFullYear());
-    setCurrentMonth(lastMonthDate.getMonth());
+    const last = new Date(currentYear, currentMonth - 1, 1);
+    // 快速跳转上月同样禁止跨到去年
+    if (last.getFullYear() < new Date().getFullYear()) return;
+    setCurrentYear(last.getFullYear());
+    setCurrentMonth(last.getMonth());
   }, [currentYear, currentMonth]);
-
-  /**
-   * 检查是否为当前月份（用于控制下月按钮状态）
-   */
-  const isCurrentMonth = (): boolean => {
-    const now = new Date();
-    return currentYear === now.getFullYear() && currentMonth === now.getMonth();
-  };
 
   return {
     data,
@@ -216,7 +122,6 @@ export const useAttendanceData = () => {
     goToNextMonth,
     goToCurrentMonth,
     goToLastMonth,
-    isCurrentMonth,
     clearError,
   };
 };
