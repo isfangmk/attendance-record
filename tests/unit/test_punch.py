@@ -26,7 +26,7 @@ def test_extract_punches_and_status_present():
     field = [{"clockInTime": "2026-03-03 09:46", "clockOutTime": "2026-03-03 19:11"}]
     punches = extract_punches(field)
     status, hours = status_from_punches(
-        punches, is_rest_day=False, target_day=date(2026, 3, 3)
+        punches, rest_status=None, target_day=date(2026, 3, 3)
     )
     assert status == DayStatus.PRESENT
     assert hours == 9.4
@@ -44,7 +44,7 @@ def test_outing_overrides_punch():
     ]
     status, _ = resolve_day_status(
         punches=punches,
-        is_rest_day=False,
+        rest_status=None,
         leave_days=0,
         outing_days=1.0,
         target_day=date(2026, 3, 3),
@@ -52,18 +52,26 @@ def test_outing_overrides_punch():
     assert status == DayStatus.OUTING
 
 
-def test_rest_day():
+def test_weekend_day():
     status, hours = status_from_punches(
-        [], is_rest_day=True, target_day=date.today()
+        [], rest_status=DayStatus.WEEKEND, target_day=date.today()
     )
-    assert status == DayStatus.REST
+    assert status == DayStatus.WEEKEND
+    assert hours == 0.0
+
+
+def test_holiday_day():
+    status, hours = status_from_punches(
+        [], rest_status=DayStatus.HOLIDAY, target_day=date.today()
+    )
+    assert status == DayStatus.HOLIDAY
     assert hours == 0.0
 
 
 def test_today_only_clock_in_is_working():
     punches = [PunchRecord(time="09:48", kind="in")]
     status, hours = status_from_punches(
-        punches, is_rest_day=False, target_day=date.today()
+        punches, rest_status=None, target_day=date.today()
     )
     assert status == DayStatus.WORKING
     assert hours == 0.0
@@ -72,6 +80,6 @@ def test_today_only_clock_in_is_working():
 def test_past_day_only_clock_in_is_early_leave():
     punches = [PunchRecord(time="09:48", kind="in")]
     status, _ = status_from_punches(
-        punches, is_rest_day=False, target_day=date.today() - timedelta(days=1)
+        punches, rest_status=None, target_day=date.today() - timedelta(days=1)
     )
     assert status == DayStatus.EARLY_LEAVE

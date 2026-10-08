@@ -74,7 +74,8 @@ export const Calendar = ({ data, isLoading, error, onRetry }: CalendarProps) => 
         dayClass +=
           ' bg-white/90 border-outing/30 hover:border-outing hover:-translate-y-0.5 hover:shadow-md';
         break;
-      case 'rest':
+      case 'weekend':
+      case 'holiday':
         dayClass += ' bg-white/90 border-neutral-200';
         break;
       default:
@@ -141,7 +142,8 @@ export const Calendar = ({ data, isLoading, error, onRetry }: CalendarProps) => 
             {record.day}
           </span>
           {record.status !== 'none' &&
-            record.status !== 'rest' &&
+            record.status !== 'weekend' &&
+            record.status !== 'holiday' &&
             record.status !== 'leave' &&
             record.status !== 'outing' && (
               <span
@@ -150,10 +152,10 @@ export const Calendar = ({ data, isLoading, error, onRetry }: CalendarProps) => 
             )}
         </div>
 
-        {record.isRestDay ? (
+        {record.status === 'weekend' || record.status === 'holiday' ? (
           <div className="mt-auto text-center py-2 space-y-1">
             <span className="inline-block text-rest text-xs">
-              休息
+              {record.status === 'weekend' ? '双休日' : '假期'}
             </span>
           </div>
         ) : record.status === 'leave' ? (

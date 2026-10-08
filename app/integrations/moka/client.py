@@ -5,7 +5,8 @@ Moka HTTP 客户端
 - 登录：passport .../mokaUid/login，可能需 force + rid
 - 日历：core .../attendance/calendar/v1/m/list
   - type=1 且有 shiftId → 工作日
-  - type=2 且 shiftId 为空 → 休息日
+  - type=2 且 shiftId 为空 → 双休日
+  - type=3 且 shiftId 为空 → 假期
 - 日详情：core .../myAttendance/v2/m/detail
   - 字段前缀 myAttendanceAttendanceRecord#
 """

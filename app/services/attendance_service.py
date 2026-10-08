@@ -7,6 +7,7 @@ from datetime import datetime
 
 from app.domain.period import split_period_by_day
 from app.domain.punch import extract_punches, parse_day_parts, resolve_day_status
+from app.domain.status import DayStatus
 from app.domain.summary import build_month_attendance
 from app.integrations.moka.client import (
     FIELD_CLOCK,
@@ -26,9 +27,23 @@ def _field_value(detail: dict, field_name: str):
     return node.get("fieldValue")
 
 
+def _rest_day_status(calendar_day: dict) -> DayStatus | None:
+    """
+    无班次日按 Moka 日历 type 区分：2=双休日，3=假期。
+    有 shiftId 则为工作日。
+    """
+    if calendar_day["shiftId"]:
+        return None
+    day_type = calendar_day["type"]
+    if day_type == 2:
+        return DayStatus.WEEKEND
+    if day_type == 3:
+        return DayStatus.HOLIDAY
+    raise ValueError(f"无班次日 type 无法识别: {day_type} ({calendar_day['day']})")
+
+
 def _is_rest_day(calendar_day: dict) -> bool:
-    """休息日判定：无 shiftId。"""
-    return not calendar_day.get("shiftId")
+    return _rest_day_status(calendar_day) is not None
 
 
 def _sum_periods(records: list | None, target_day: str) -> float:
@@ -87,7 +102,8 @@ async def _build_day_record(
     employee_id: int,
 ) -> DayRecord:
     day = calendar_day["day"]
-    is_rest = _is_rest_day(calendar_day)
+    rest_status = _rest_day_status(calendar_day)
+    is_rest = rest_status is not None
     detail = await client.fetch_day_detail(year, month, day, employee_id)
 
     leave_records = _field_value(detail, FIELD_LEAVE)
@@ -98,7 +114,7 @@ async def _build_day_record(
     target_day = datetime.strptime(day, "%Y-%m-%d").date()
     status, work_hours = resolve_day_status(
         punches=punches,
-        is_rest_day=is_rest,
+        rest_status=rest_status,
         leave_days=leave_days,
         outing_days=outing_days,
         target_day=target_day,

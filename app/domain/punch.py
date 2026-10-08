@@ -80,14 +80,14 @@ def _incomplete_punch_status(*, target_day: date) -> DayStatus:
 def status_from_punches(
     punches: list[PunchRecord],
     *,
-    is_rest_day: bool,
+    rest_status: DayStatus | None,
     target_day: date,
 ) -> tuple[DayStatus, float]:
     """
-    仅根据打卡推断状态与工时；休息日强制 REST。
+    仅根据打卡推断状态与工时；双休日/假期直接返回对应状态。
     """
-    if is_rest_day:
-        return DayStatus.REST, 0.0
+    if rest_status is not None:
+        return rest_status, 0.0
 
     if len(punches) == 0:
         return DayStatus.NONE, 0.0
@@ -114,7 +114,7 @@ def status_from_punches(
 def resolve_day_status(
     *,
     punches: list[PunchRecord],
-    is_rest_day: bool,
+    rest_status: DayStatus | None,
     leave_days: float,
     outing_days: float,
     target_day: date,
@@ -125,7 +125,7 @@ def resolve_day_status(
     优先级：外出 > 请假 > 打卡规则。
     """
     punch_status, work_hours = status_from_punches(
-        punches, is_rest_day=is_rest_day, target_day=target_day
+        punches, rest_status=rest_status, target_day=target_day
     )
     if outing_days > 0:
         return DayStatus.OUTING, work_hours

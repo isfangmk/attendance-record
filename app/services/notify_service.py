@@ -12,7 +12,8 @@ from httpx import AsyncClient
 from app.domain.punch import extract_punches, first_clock_in_time, today_iso
 from app.integrations.moka.client import FIELD_CLOCK, FIELD_LEAVE, FIELD_OUTING
 from app.services import session_store, settings_store
-from app.services.attendance_service import _field_value, _is_rest_day, _sum_periods
+from app.domain.status import DayStatus
+from app.services.attendance_service import _field_value, _rest_day_status, _sum_periods
 
 
 async def _post_wecom(webhook: str, payload: dict) -> bool:
@@ -67,8 +68,10 @@ async def _check_one(email: str, session) -> None:
         if today_cal is None:
             print(f"{today_cn} {email} 月历中无今日，跳过")
             return
-        if _is_rest_day(today_cal):
-            print(f"{today_cn} {email} 今日休息，跳过")
+        rest_status = _rest_day_status(today_cal)
+        if rest_status is not None:
+            label = "双休日" if rest_status == DayStatus.WEEKEND else "假期"
+            print(f"{today_cn} {email} 今日{label}，跳过")
             return
 
         detail = await session.client.fetch_day_detail(year, month, today, session.employee_id)

@@ -14,7 +14,8 @@ class DayStatus(StrEnum):
     MEAL_ALLOWANCE = "meal_allowance"  # 可申请餐补（工时 ≥ 11h）
     LEAVE = "leave"  # 请假
     OUTING = "outing"  # 外出
-    REST = "rest"  # 休息日 / 节假日
+    WEEKEND = "weekend"  # 双休日（日历 type=2）
+    HOLIDAY = "holiday"  # 假期（日历 type=3）
     NONE = "none"  # 无记录
 
 

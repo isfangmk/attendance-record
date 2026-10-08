@@ -10,7 +10,8 @@ export type DayStatus =
   | 'meal_allowance'
   | 'leave'
   | 'outing'
-  | 'rest'
+  | 'weekend'
+  | 'holiday'
   | 'none';
 
 /** 打卡方向 */

@@ -9,7 +9,7 @@ def _day(day: int, status: str, hours: float = 0.0) -> DayRecord:
     return DayRecord(
         day=day,
         weekday=0,
-        is_rest_day=status == DayStatus.REST,
+        is_rest_day=status in (DayStatus.WEEKEND, DayStatus.HOLIDAY),
         punches=[],
         status=status,
         work_hours=hours,
@@ -20,7 +20,7 @@ def _day(day: int, status: str, hours: float = 0.0) -> DayRecord:
 
 def test_build_summary_counts():
     days = [
-        _day(1, DayStatus.REST),
+        _day(1, DayStatus.WEEKEND),
         _day(2, DayStatus.MEAL_ALLOWANCE, 11.1),
         _day(3, DayStatus.PRESENT, 9.4),
         _day(4, DayStatus.EARLY_LEAVE, 6.4),

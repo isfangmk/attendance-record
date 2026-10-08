@@ -13,7 +13,7 @@ export default {
         overtime: '#C026D3', // 餐补 · 品红紫
         info: '#F59E0B', // 请假 · 琥珀
         outing: '#0891B2', // 外出 · 青
-        rest: '#57534E', // 假期 · 暖石灰
+        rest: '#57534E', // 双休日 / 假期 · 暖石灰
         absent: '#CBD5E1', // 未打卡 · 浅冷灰
         danger: '#F87272',
         neutral: {

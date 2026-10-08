@@ -136,6 +136,10 @@ export const MonthNavigation: React.FC<MonthNavigationProps> = ({
         </div>
         <div className="flex items-center gap-1.5">
           <span className="w-3 h-3 rounded-full bg-rest"></span>
+          <span>双休日</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="w-3 h-3 rounded-full bg-rest"></span>
           <span>假期</span>
         </div>
         <div className="flex items-center gap-1.5">

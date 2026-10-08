@@ -102,4 +102,4 @@ docker run -p 8000:8000 attendance-record
 
 响应壳：`{ "msg": string, "data": object | null }`。
 
-出勤 `data` 字段（camelCase）：`daysInMonth`、`firstWeekday`、`summary`、`days`；单日状态含 `present` / `early_leave` / `meal_allowance` / `leave` / `outing` / `rest` / `none`。
+出勤 `data` 字段（camelCase）：`daysInMonth`、`firstWeekday`、`summary`、`days`；单日状态含 `present` / `early_leave` / `meal_allowance` / `leave` / `outing` / `weekend` / `holiday` / `none`。

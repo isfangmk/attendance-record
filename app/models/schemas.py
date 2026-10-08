@@ -49,7 +49,7 @@ class DayRecord(CamelModel):
     outing_label: Optional[str] = Field(
         default=None, serialization_alias="outingLabel", validation_alias="outingLabel"
     )
-    # 班次名称（休息日可为空）
+    # 班次名称（双休日/假期可为空）
     shift_name: Optional[str] = Field(
         default=None, serialization_alias="shiftName", validation_alias="shiftName"
     )
