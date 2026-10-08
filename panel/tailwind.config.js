@@ -16,7 +16,6 @@ export default {
         rest: '#57534E', // 假期 · 暖石灰
         absent: '#CBD5E1', // 未打卡 · 浅冷灰
         danger: '#F87272',
-        amber: '#F59E0B', // 保留兼容，外出改用 outing
         neutral: {
           100: '#F5F7FA',
           200: '#E4E7ED',

@@ -21,13 +21,12 @@ from app.config import (
     CHECKIN_CRON_MINUTE,
     CHECKIN_CUTOFF_LABEL,
     PROJECT_ROOT,
-    WECHAT_WEBHOOK_URL,
 )
 
 SETTINGS_PATH = PROJECT_ROOT / "settings.json"
 
 _USER_DEFAULTS: dict[str, Any] = {
-    "wechatWebhookUrl": WECHAT_WEBHOOK_URL or "",
+    "wechatWebhookUrl": "",
     "checkinCronHour": CHECKIN_CRON_HOUR,
     "checkinCronMinute": CHECKIN_CRON_MINUTE,
     "checkinCutoffLabel": CHECKIN_CUTOFF_LABEL,
@@ -44,9 +43,11 @@ def _read_disk() -> dict[str, Any]:
         data = json.load(fp)
     if not isinstance(data, dict):
         raise ValueError("settings.json 格式错误")
-    users = data.get("users")
+    if "users" not in data:
+        raise ValueError("settings.json 缺少 users 字段")
+    users = data["users"]
     if not isinstance(users, dict):
-        return {"users": {}}
+        raise TypeError("settings.json 的 users 必须是对象")
     return {"users": users}
 
 
@@ -63,14 +64,17 @@ def _ensure_cache() -> dict[str, Any]:
 
 
 def get_user_settings(email: str) -> dict[str, Any]:
-    """读取某用户提醒配置（缺失字段用默认值填充后返回副本）。"""
+    """读取某用户提醒配置；无记录返回默认值，有记录则字段必须齐全。"""
     store = _ensure_cache()
-    saved = store["users"].get(email) or {}
-    merged = deepcopy(_USER_DEFAULTS)
-    for key in _USER_DEFAULTS:
-        if key in saved:
-            merged[key] = saved[key]
-    return merged
+    saved = store["users"].get(email)
+    if saved is None:
+        return deepcopy(_USER_DEFAULTS)
+    if not isinstance(saved, dict):
+        raise TypeError(f"用户配置格式错误: {email}")
+    missing = [key for key in _USER_DEFAULTS if key not in saved]
+    if missing:
+        raise KeyError(f"用户配置缺少字段: {', '.join(missing)}")
+    return {key: saved[key] for key in _USER_DEFAULTS}
 
 
 def update_user_settings(email: str, patch: dict[str, Any]) -> dict[str, Any]:
@@ -87,11 +91,11 @@ def update_user_settings(email: str, patch: dict[str, Any]) -> dict[str, Any]:
 
 
 def get_wechat_webhook_url(email: str) -> str:
-    return str(get_user_settings(email).get("wechatWebhookUrl") or "")
+    return str(get_user_settings(email)["wechatWebhookUrl"])
 
 
 def get_checkin_cutoff_label(email: str) -> str:
-    return str(get_user_settings(email).get("checkinCutoffLabel") or CHECKIN_CUTOFF_LABEL)
+    return str(get_user_settings(email)["checkinCutoffLabel"])
 
 
 def should_notify_now(email: str, *, hour: int, minute: int) -> bool:

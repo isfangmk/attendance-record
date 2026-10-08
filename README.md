@@ -44,12 +44,11 @@ python main.py
 
 | 变量 | 说明 | 默认 |
 |------|------|------|
-| `WECHAT_WEBHOOK_URL` | 企业微信机器人 Webhook（也可在面板「配置」中设置） | 空（跳过推送） |
-| `ATTENDANCE_PANEL_URL` | 推送卡片跳转链接 | `http://127.0.0.1:8000/attendance-record/` |
-| `CHECKIN_CRON_HOUR` / `CHECKIN_CRON_MINUTE` | 打卡检查时间 | `9` / `50` |
+| `CHECKIN_CRON_HOUR` / `CHECKIN_CRON_MINUTE` | 新用户默认提醒时间（时/分） | `9` / `50` |
+| `CHECKIN_TIME_CUTOFF_HHMM` | 新用户默认检查时刻文案 | `09:50` |
 | `ATTENDANCE_ROOT_PATH` | URL 前缀 | `/attendance-record` |
 
-登录后右上角「提醒配置」可按账号保存 Webhook 与提醒时间；写入本地 `settings.json`（已 gitignore），各用户互不影响。
+企业微信 Webhook 与提醒时间仅按登录账号保存在本地 `settings.json`（已 gitignore），互不影响；未配置 Webhook 则跳过推送。
 
 ### 测试
 
@@ -88,7 +87,7 @@ npm run test:run
 ```bash
 cd panel && npm ci && npm run build && cd ..
 docker build -t attendance-record .
-docker run -p 8000:8000 -e WECHAT_WEBHOOK_URL=... attendance-record
+docker run -p 8000:8000 attendance-record
 ```
 
 ## API 摘要

@@ -15,16 +15,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 # HTTP 挂载前缀（与反向代理、前端 base path 对齐）
 ROOT_PATH = os.getenv("ATTENDANCE_ROOT_PATH", "/attendance-record")
 
-# 企业微信机器人 Webhook；未配置则跳过推送
-WECHAT_WEBHOOK_URL = os.getenv("WECHAT_WEBHOOK_URL", "")
-
-# 推送卡片中的面板链接
-PANEL_URL = os.getenv(
-    "ATTENDANCE_PANEL_URL",
-    "http://127.0.0.1:8000/attendance-record/",
-)
-
-# 每日打卡检查 cron
+# 新用户提醒配置的默认检查时间（实际以 settings.json 中每用户配置为准）
 CHECKIN_CRON_HOUR = int(os.getenv("CHECKIN_CRON_HOUR", "9"))
 CHECKIN_CRON_MINUTE = int(os.getenv("CHECKIN_CRON_MINUTE", "50"))
 CHECKIN_CUTOFF_LABEL = os.getenv("CHECKIN_TIME_CUTOFF_HHMM", "09:50")

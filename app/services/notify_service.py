@@ -60,7 +60,7 @@ async def _check_one(email: str, session) -> None:
     today_cn = datetime.now().strftime("%Y年%m月%d日")
     year = date.today().year
     month = date.today().month
-    user_label = session.real_name or email
+    user_label = session.real_name
     try:
         calendar_days = await session.client.fetch_month_calendar(year, month)
         today_cal = next((d for d in calendar_days if d.get("day") == today), None)

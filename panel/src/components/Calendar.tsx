@@ -2,7 +2,7 @@
  * 月度出勤日历（展示打卡、结果、请假/外出类型等）
  */
 
-import type { DayRecord, MonthAttendance } from '../types/attendance';
+import type { DayRecord, DayStatus, MonthAttendance } from '../types/attendance';
 
 interface CalendarProps {
   data: MonthAttendance | null;
@@ -12,6 +12,21 @@ interface CalendarProps {
 }
 
 const WEEK_LABELS = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+
+const STATUS_DOT_CLASS: Partial<Record<DayStatus, string>> = {
+  present: 'bg-success',
+  early_leave: 'bg-warning',
+  working: 'bg-working',
+  meal_allowance: 'bg-overtime',
+};
+
+function statusDotClass(status: DayStatus): string {
+  const cls = STATUS_DOT_CLASS[status];
+  if (!cls) {
+    throw new Error(`状态点无对应颜色: ${status}`);
+  }
+  return cls;
+}
 
 /** 打卡结果是否需要醒目提示（非正常） */
 const isAbnormalResult = (result?: string | null) =>
@@ -130,17 +145,7 @@ export const Calendar = ({ data, isLoading, error, onRetry }: CalendarProps) => 
             record.status !== 'leave' &&
             record.status !== 'outing' && (
               <span
-                className={`w-2 h-2 rounded-full self-center ${
-                  record.status === 'present'
-                    ? 'bg-success'
-                    : record.status === 'early_leave'
-                      ? 'bg-warning'
-                      : record.status === 'working'
-                        ? 'bg-working'
-                        : record.status === 'meal_allowance'
-                          ? 'bg-overtime'
-                          : 'bg-neutral-300'
-                }`}
+                className={`w-2 h-2 rounded-full self-center ${statusDotClass(record.status)}`}
               />
             )}
         </div>
@@ -257,13 +262,13 @@ export const Calendar = ({ data, isLoading, error, onRetry }: CalendarProps) => 
               <div className="text-[10px] text-neutral-500 text-center truncate">
                 {record.leaveDays > 0 && (
                   <span className="text-info">
-                    {record.leaveLabel || '请假'} {record.leaveDays}天
+                    {record.leaveLabel} {record.leaveDays}天
                   </span>
                 )}
                 {record.leaveDays > 0 && record.outingDays > 0 && ' · '}
                 {record.outingDays > 0 && (
                   <span className="text-outing">
-                    {record.outingLabel || '外出'} {record.outingDays}天
+                    {record.outingLabel} {record.outingDays}天
                   </span>
                 )}
               </div>

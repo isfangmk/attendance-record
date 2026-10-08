@@ -43,7 +43,11 @@ async def read_settings(email: str = Query(...)):
     denied = _require_session(email)
     if denied is not None:
         return denied
-    return JSONResponse({"msg": "ok", "data": settings_store.get_user_settings(email)})
+    try:
+        data = settings_store.get_user_settings(email)
+    except (KeyError, TypeError, ValueError) as exc:
+        return JSONResponse({"msg": str(exc), "data": None})
+    return JSONResponse({"msg": "ok", "data": data})
 
 
 @router.put("/settings")

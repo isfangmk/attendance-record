@@ -45,12 +45,8 @@ def _write_disk() -> None:
 def load_persisted() -> None:
     """模块启动时加载磁盘数据。"""
     global _persisted
-    try:
-        _persisted = _read_disk()
-        print(f"已加载 {len(_persisted)} 条持久化登录信息")
-    except Exception as exc:
-        _persisted = {}
-        print(f"加载持久化登录信息失败: {exc}")
+    _persisted = _read_disk()
+    print(f"已加载 {len(_persisted)} 条持久化登录信息")
 
 
 def get_session(email: str) -> UserSession | None:
@@ -88,11 +84,9 @@ def restore_sessions() -> int:
     """根据磁盘 Cookie 重建内存客户端。"""
     count = 0
     for email, info in list(_persisted.items()):
-        cookie = info.get("cookie")
-        employee_id = info.get("employee_id")
-        real_name = info.get("real_name")
-        if not cookie or employee_id is None or not real_name:
-            continue
+        cookie = info["cookie"]
+        employee_id = info["employee_id"]
+        real_name = info["real_name"]
         client = MokaClient()
         client.apply_cookie(cookie)
         _sessions[email] = UserSession(
