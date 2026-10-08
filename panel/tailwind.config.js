@@ -4,14 +4,19 @@ export default {
   theme: {
     extend: {
       colors: {
+        // 品牌色（按钮/导航，不参与状态图例）
         primary: '#165DFF',
-        success: '#36D399',
-        warning: '#E53E3E',
+        // 出勤状态色：色相环 + 冷暖/明度错开，图例一眼可辨
+        success: '#16A34A', // 正常出勤 · 翠绿
+        warning: '#E11D48', // 早退 · 玫红
+        working: '#0EA5E9', // 进行中 · 天蓝（避开品牌蓝）
+        overtime: '#C026D3', // 餐补 · 品红紫
+        info: '#F59E0B', // 请假 · 琥珀
+        outing: '#0891B2', // 外出 · 青
+        rest: '#57534E', // 假期 · 暖石灰
+        absent: '#CBD5E1', // 未打卡 · 浅冷灰
         danger: '#F87272',
-        info: '#FF6B35',
-        amber: '#F59E0B',
-        overtime: '#722ED1',
-        working: '#0EA5E9', // 进行中（天空蓝，区别于假期蓝与出勤绿）
+        amber: '#F59E0B', // 保留兼容，外出改用 outing
         neutral: {
           100: '#F5F7FA',
           200: '#E4E7ED',

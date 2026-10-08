@@ -57,14 +57,14 @@ export const Calendar = ({ data, isLoading, error, onRetry }: CalendarProps) => 
         break;
       case 'outing':
         dayClass +=
-          ' bg-white/90 border-amber/25 hover:border-amber hover:-translate-y-0.5 hover:shadow-md';
+          ' bg-white/90 border-outing/30 hover:border-outing hover:-translate-y-0.5 hover:shadow-md';
         break;
       case 'rest':
-        dayClass += ' bg-primary/8 border-primary/20';
+        dayClass += ' bg-white/90 border-neutral-200';
         break;
       default:
         // 未打卡：与其它格子同样保留圆角描边，避免“裸字”
-        dayClass += ' bg-white/90 border-neutral-200';
+        dayClass += ' bg-white/90 border-absent/50';
     }
 
     const inPunch = record.punches.find((p) => p.kind === 'in');
@@ -115,7 +115,7 @@ export const Calendar = ({ data, isLoading, error, onRetry }: CalendarProps) => 
         <div className="flex justify-between items-start mb-1">
           <span
             className={`text-sm font-semibold inline-flex items-center gap-1 ${
-              record.isRestDay ? 'text-primary' : 'text-neutral-700'
+              record.isRestDay ? 'text-rest' : 'text-neutral-700'
             }`}
           >
             {isToday && (
@@ -147,7 +147,7 @@ export const Calendar = ({ data, isLoading, error, onRetry }: CalendarProps) => 
 
         {record.isRestDay ? (
           <div className="mt-auto text-center py-2 space-y-1">
-            <span className="inline-block px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
+            <span className="inline-block text-rest text-xs">
               休息
             </span>
           </div>
@@ -173,11 +173,11 @@ export const Calendar = ({ data, isLoading, error, onRetry }: CalendarProps) => 
         ) : record.status === 'outing' ? (
           <div className="mt-auto text-center space-y-1 py-1">
             {record.outingLabel && (
-              <p className="text-[10px] text-amber font-medium truncate px-0.5">
+              <p className="text-[10px] text-outing font-medium truncate px-0.5">
                 {record.outingLabel}
               </p>
             )}
-            <span className="text-amber text-[10px] bg-amber/10 px-1.5 py-0.5 rounded inline-flex items-center">
+            <span className="text-outing text-[10px] bg-outing/10 px-1.5 py-0.5 rounded inline-flex items-center">
               外出
               {record.outingDays > 0 && (
                 <span className="ml-1 font-medium">{record.outingDays}天</span>
@@ -262,7 +262,7 @@ export const Calendar = ({ data, isLoading, error, onRetry }: CalendarProps) => 
                 )}
                 {record.leaveDays > 0 && record.outingDays > 0 && ' · '}
                 {record.outingDays > 0 && (
-                  <span className="text-amber">
+                  <span className="text-outing">
                     {record.outingLabel || '外出'} {record.outingDays}天
                   </span>
                 )}
@@ -271,7 +271,7 @@ export const Calendar = ({ data, isLoading, error, onRetry }: CalendarProps) => 
           </div>
         ) : (
           <div className="mt-auto text-center py-2">
-            <span className="text-neutral-400 text-[10px] bg-neutral-100 px-1.5 py-0.5 rounded">
+            <span className="text-absent text-[10px] bg-absent/15 px-1.5 py-0.5 rounded">
               未打卡
             </span>
           </div>

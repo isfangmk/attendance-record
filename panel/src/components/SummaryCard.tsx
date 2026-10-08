@@ -7,7 +7,7 @@ interface SummaryCardProps {
   value: string | number;
   subtitle?: string;
   icon: string;
-  color: 'primary' | 'success' | 'warning' | 'info' | 'amber' | 'overtime';
+  color: 'primary' | 'success' | 'warning' | 'info' | 'outing' | 'overtime';
   isLoading?: boolean;
   onClick?: (e: React.MouseEvent) => void;
   isClickable?: boolean;
@@ -18,7 +18,7 @@ const COLOR_MAP = {
   success: { bg: 'bg-success/10', text: 'text-success' },
   warning: { bg: 'bg-warning/10', text: 'text-warning' },
   info: { bg: 'bg-info/10', text: 'text-info' },
-  amber: { bg: 'bg-amber/10', text: 'text-amber' },
+  outing: { bg: 'bg-outing/10', text: 'text-outing' },
   overtime: { bg: 'bg-overtime/10', text: 'text-overtime' },
 } as const;
 

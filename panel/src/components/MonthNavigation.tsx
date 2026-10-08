@@ -123,7 +123,7 @@ export const MonthNavigation: React.FC<MonthNavigationProps> = ({
           <span>进行中（当天未下班）</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="w-3 h-3 rounded-full bg-overtime/20"></span>
+          <span className="w-3 h-3 rounded-full bg-overtime"></span>
           <span>餐补 (≥11小时)</span>
         </div>
         <div className="flex items-center gap-1.5">
@@ -131,15 +131,15 @@ export const MonthNavigation: React.FC<MonthNavigationProps> = ({
           <span>请假</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="w-3 h-3 rounded-full bg-amber"></span>
+          <span className="w-3 h-3 rounded-full bg-outing"></span>
           <span>外出</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="w-3 h-3 rounded-full bg-primary/60"></span>
+          <span className="w-3 h-3 rounded-full bg-rest"></span>
           <span>假期</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="w-3 h-3 rounded-full bg-neutral-300"></span>
+          <span className="w-3 h-3 rounded-full bg-absent"></span>
           <span>未打卡</span>
         </div>
       </div>

@@ -155,7 +155,7 @@ function App() {
             value={summaryValue('outingDays')}
             subtitle="因公外出记录"
             icon="fa-sign-out"
-            color="amber"
+            color="outing"
             isLoading={dataLoading}
           />
           <div className="relative">
