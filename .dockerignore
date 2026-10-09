@@ -1,0 +1,32 @@
+# 版本控制 / IDE / 本地工具
+.git
+.gitignore
+.idea/
+.vscode/
+.serena/
+.probe/
+
+# Python 缓存与虚拟环境
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.coverage
+
+# 前端：镜像只需要构建产物 panel/dist
+panel/node_modules/
+panel/src/
+panel/public/
+panel/coverage/
+panel/.env.development
+panel/.env.production
+
+# 测试与本地开发文件
+tests/
+pytest.ini
+requirements-dev.txt
+README.md
+Dockerfile
+.dockerignore
